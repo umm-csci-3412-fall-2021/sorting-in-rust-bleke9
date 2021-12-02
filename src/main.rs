@@ -97,7 +97,7 @@ fn quicksort<T: PartialOrd + std::fmt::Debug>(v: &mut [T]) {
     // are smaller than the original array; without it you can
     // end up with infinite recursion.)
 
-    let length = v.len();
+    let length = v.len() as usize;
     // If the array has 0 or 1 elements it's already sorted
     // and we'll just stop.
     if length < 2 {
@@ -105,17 +105,33 @@ fn quicksort<T: PartialOrd + std::fmt::Debug>(v: &mut [T]) {
     }
 
     // Now choose a pivot and do the organizing.
-    
-    // ...
 
-    let smaller = 0; // Totally wrong – you should fix this.
+    let pivot = partition(v);
 
     // Sort all the items < pivot
-    quicksort(&mut v[0..smaller]);
+    quicksort(&mut v[0..pivot]);
     // Sort all the items ≥ pivot, *not* including the
     // pivot value itself. If we don't include the +1
     // here you can end up in infinite recursions.
-    quicksort(&mut v[smaller+1..length]);
+    quicksort(&mut v[pivot+1..length]);
+}
+
+// Uses right-most pivot
+fn partition<T: PartialOrd>(v: &mut[T]) -> usize{
+    let len = v.len();
+    let mut i = 0;
+    let mut j = 0;
+    while j < len-1{
+        if v[j] <= v[len-1]{
+            v.swap(i,j);
+            i+=1;
+        }
+        j+=1;
+    }
+
+    v.swap(i, len - 1);
+
+    i
 }
 
 // Merge sort can't be done "in place", so it needs to return a _new_
@@ -184,7 +200,34 @@ fn merge<T: PartialOrd + std::marker::Copy + std::fmt::Debug>(xs: Vec<T>, ys: Ve
 
     // This is totally wrong and will not sort. You should replace it
     // with something useful. :)
-    xs
+    let mut i = 0;
+    let mut j = 0;
+    let mut merged: Vec<T> = Vec::new();
+
+    while i < xs.len() && j < ys.len(){
+        if xs[i] < ys[j] {
+            merged.push(xs[i]);
+            i+=1;
+        }
+        else {
+            merged.push(ys[j]);
+            j+=1;
+        }
+    }
+    if i < xs.len() {
+        while i < xs.len() {
+            merged.push(xs[i]);
+            i+=1;
+        }
+    }
+    if j < ys.len() {
+        while j < ys.len() {
+            merged.push(ys[j]);
+            j+=1;
+        }
+    }
+
+    merged
 }
 
 fn is_sorted<T: PartialOrd>(slice: &[T]) -> bool {
